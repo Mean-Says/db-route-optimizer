@@ -1,0 +1,28 @@
+name: query-guard
+
+# Example CI that runs the deterministic N+1 guard. Copy into your own repo and point
+# the pytest step at your test suite to fail the build whenever an N+1 regression appears.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  query-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install sqlalchemy pytest
+
+      - name: Query counter self-test (N+1 vs batched)
+        run: python scripts/querycount.py
+
+      - name: Run N+1 guard tests
+        run: pytest examples/ -v
