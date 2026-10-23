@@ -20,8 +20,8 @@ Declared seed cardinalities (see `seed.py`):
 | products | 5000 |
 | categories | 20 |
 
-Seed duration: measured on each run (`seed_seconds` in the JSON). Initial choice pending
-first timed run — `[MEDIR: seed_seconds on CI/dev]`.
+Seed duration: measured on each run (`seed_seconds` in the JSON). On the cloud agent that
+first produced `runs/sqlite/latest.json`, `seed_seconds ≈ 0.16–0.17` (Linux x86_64, Python 3.12).
 
 ## Quick start (SQLite, no Docker)
 
@@ -37,6 +37,12 @@ make reproduce
 ```
 
 Requires Docker. Postgres URL default: `postgresql://dbro:dbro@127.0.0.1:5432/dbro`.
+
+**Status:** `make reproduce-sqlite` is measured and logged in this tree. Full `make reproduce`
+(Postgres + SQLite) was **not** run in the environment that opened the Phase 0 PR — that VM
+had no Docker. CI still runs explain against a `postgres:16` service. To fill Postgres rows in
+`optimization_log.md` / `runs/postgres/`, run `make reproduce` on a machine with Docker and
+commit the new log JSON (do not invent numbers).
 
 ## Outputs
 
