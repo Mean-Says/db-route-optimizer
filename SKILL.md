@@ -80,10 +80,11 @@ Identical `--n`, `--warmup`, target, and conditions as the baseline.
 python scripts/bench.py --compare /tmp/perf/base.json /tmp/perf/cand.json \
   --name "GET /users" --log docs/perf/optimization_log.md
 ```
-Prints e.g. `-> 92.3% faster | 13.07x` and appends a row to the log (Target | Metric | Before |
-After | Improvement | Speedup). Report median by default; also mention p95 (`--metric p95_ms`) since
-event-loop/caching fixes mostly improve the tail. For N+1 fixes, also record the query-count drop
-(e.g. `401 -> 3 queries`) — it's the cleanest before/after when wall-time isn't measurable.
+Prints `% faster | Nx` from the measured JSONs and appends a row to the log (Target | Metric |
+Before | After | Improvement | Speedup). **Never invent numbers** — cite only values from a log
+produced by `make reproduce` (or this compare step). Report median by default; also mention p95
+(`--metric p95_ms`) since event-loop/caching fixes mostly improve the tail. For N+1 fixes, also
+record the query-count drop — it's the cleanest before/after when wall-time isn't measurable.
 
 ## Step 6 — Verify correctness
 
