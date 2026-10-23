@@ -132,6 +132,13 @@ reproducible before/after log.
 See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md),
 [SECURITY.md](SECURITY.md), and [CHANGELOG.md](CHANGELOG.md).
 
+## Radar de Empregos playbook (Etapa 2 prep)
+
+Closed-app measurements stay private. Public hooks/checklists/scripts:
+[`docs/radar/`](docs/radar/README.md). Requires a sanitized local Postgres copy — see the access
+table in that README.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
+

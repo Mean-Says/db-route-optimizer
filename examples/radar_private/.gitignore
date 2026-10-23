@@ -1,0 +1,5 @@
+# Never commit filled private logs or dumps
+*
+!.gitignore
+!optimization_log.TEMPLATE.md
+!README.md
