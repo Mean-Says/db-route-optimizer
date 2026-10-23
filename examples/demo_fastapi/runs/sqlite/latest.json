@@ -1,0 +1,122 @@
+{
+  "environment": {
+    "timestamp": "2026-10-23T14:44:35.566429+00:00",
+    "git_sha": "8d7940111372bdc4e2332a7796cd53d95c2862f7",
+    "backend": "sqlite",
+    "python": "3.12.3",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "seed": {
+      "seed": 42,
+      "counts": {
+        "users": 200,
+        "posts_per_user": 5,
+        "products": 5000,
+        "categories": 20,
+        "posts": 1000
+      },
+      "database": "sqlite:////workspace/examples/demo_fastapi/demo.db",
+      "seed_seconds": 0.158,
+      "fingerprint": "f4ba0e78ff9f",
+      "notes": "Initial counts: users=200, posts=1000, products=5000, categories=20. Replaced with measured seed duration after first successful run."
+    }
+  },
+  "n": 30,
+  "warmup": 5,
+  "results": [
+    {
+      "name": "nplus1_selectinload",
+      "change": "lazy posts -> selectinload",
+      "queries_before": 51,
+      "queries_after": 2,
+      "baseline": {
+        "n": 30,
+        "min_ms": 11.75,
+        "mean_ms": 14.07,
+        "median_ms": 12.87,
+        "p95_ms": 22.51,
+        "max_ms": 29.13,
+        "stdev_ms": 4.06
+      },
+      "candidate": {
+        "n": 30,
+        "min_ms": 6.1,
+        "mean_ms": 6.79,
+        "median_ms": 6.79,
+        "p95_ms": 7.5,
+        "max_ms": 8.44,
+        "stdev_ms": 0.5
+      },
+      "equality_hash_match": true,
+      "hash": "9d18770c8be7adde7524ba16557e25ba739060c85bad2b95230ca72d39cf40ca",
+      "comparison": {
+        "improvement_pct": 47.24,
+        "speedup": 1.9
+      }
+    },
+    {
+      "name": "missing_index_category_name",
+      "change": "CREATE INDEX on products(category, name)",
+      "baseline": {
+        "n": 30,
+        "min_ms": 3.91,
+        "mean_ms": 4.63,
+        "median_ms": 4.57,
+        "p95_ms": 5.29,
+        "max_ms": 5.62,
+        "stdev_ms": 0.38
+      },
+      "candidate": {
+        "n": 30,
+        "min_ms": 3.91,
+        "mean_ms": 4.48,
+        "median_ms": 4.34,
+        "p95_ms": 5.2,
+        "max_ms": 6.11,
+        "stdev_ms": 0.46
+      },
+      "equality_hash_match": true,
+      "hash": "b29d8c7fc53f2a14b37dc0c5483dd620e3fc0f6ddd1f7db57abc856611579168",
+      "suggest_index_verified": {
+        "raw": "verified suggestion (re-measured on local DB):\nCREATE INDEX IF NOT EXISTS ix_products_category_name ON products (category, name);\n{\n  \"database\": \"sqlite:////workspace/examples/demo_fastapi/demo.db\",\n  \"dialect\": \"sqlite\",\n  \"analyze\": true,\n  \"local\": true,\n  \"sql\": \"SELECT id, category, name, price_cents FROM products WHERE category = 'cat-01' ORDER BY name LIMIT 100\",\n  \"plan\": [\n    {\n      \"id\": 4,\n      \"parent\": 0,\n      \"detail\": \"SCAN products\"\n    },\n    {\n      \"id\": 20,\n      \"parent\": 0,\n      \"detail\": \"USE TEMP B-TREE FOR ORDER BY\"\n    }\n  ],\n  \"suggestions\": [\n    \"CREATE INDEX IF NOT EXISTS ix_products_category_name ON products (category, name);\"\n  ],\n  \"verified\": [\n    {\n      \"ddl\": \"CREATE INDEX IF NOT EXISTS ix_products_category_name ON products (category, name);\",\n      \"before\": [\n        {\n          \"id\": 4,\n          \"parent\": 0,\n          \"detail\": \"SCAN products\"\n        },\n        {\n          \"id\": 20,\n          \"parent\": 0,\n          \"detail\": \"USE TEMP B-TREE FOR ORDER BY\"\n        }\n      ],\n      \"after\": [\n        {\n          \"id\": 5,\n          \"parent\": 0,\n          \"detail\": \"SEARCH products USING INDEX ix_products_category_name (category=?)\"\n        }\n      ]\n    }\n  ]\n}\n"
+      },
+      "comparison": {
+        "improvement_pct": 5.03,
+        "speedup": 1.05
+      }
+    },
+    {
+      "name": "batch_insert",
+      "change": "commit-per-row -> single-transaction bulk insert",
+      "rows": 200,
+      "baseline": {
+        "n": 30,
+        "min_ms": 92.84,
+        "mean_ms": 135.6,
+        "median_ms": 133.45,
+        "p95_ms": 177.38,
+        "max_ms": 189.96,
+        "stdev_ms": 25.09
+      },
+      "candidate": {
+        "n": 30,
+        "min_ms": 11.21,
+        "mean_ms": 13.24,
+        "median_ms": 12.29,
+        "p95_ms": 14.1,
+        "max_ms": 35.85,
+        "stdev_ms": 4.28
+      },
+      "rows_per_s_before_median": 1498.7,
+      "rows_per_s_after_median": 16273.4,
+      "equality_rowcount_match": true,
+      "checksum_before": "0ae90cbaa4b3cfd6181e952c81d863f4a7eda90860d34701b0d39124d5e29a33",
+      "checksum_after": "7b94c2ea4ee13a330afb0472d05346276ff008fe91f0c299b4e4f9db9bb76d6b",
+      "comparison": {
+        "improvement_pct": 90.79,
+        "speedup": 10.86
+      }
+    }
+  ]
+}

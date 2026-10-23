@@ -81,8 +81,12 @@ make reproduce-sqlite   # no Docker
 make reproduce          # Postgres 16 via docker compose + SQLite
 ```
 
-Numbers in docs come only from the log under `examples/demo_fastapi/runs/`
-(see `optimization_log.md`). Placeholders look like `[MEDIR: ...]` until measured.
+Numbers in docs come only from the log under `examples/demo_fastapi/`
+([optimization_log.md](examples/demo_fastapi/optimization_log.md) +
+`runs/<backend>/latest.json`). Example (SQLite, n=30, warmup=5, seed=42 — see log for
+environment): N+1 **51→2 queries**, median **~47% faster**; batch insert median **~91% faster**.
+Missing-index latency on SQLite at 5k rows is small; see the verified suggest-index entry in the
+JSON. Placeholders look like `[MEDIR: ...]` until measured.
 
 ## What it does
 
