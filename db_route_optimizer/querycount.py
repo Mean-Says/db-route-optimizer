@@ -48,8 +48,8 @@ class QueryCounter:
 
     def _record(self, sql: str, parameters=None):
         self.total += 1
-        verb = (re.match(r"\s*(\w+)", sql or "") or re.match(r".*", "")).group(1)
-        verb = (verb or "OTHER").upper()
+        m = re.match(r"\s*(\w+)", sql or "")
+        verb = (m.group(1) if m else "OTHER").upper()
         self.by_type[verb] = self.by_type.get(verb, 0) + 1
         self.statements.append(sql)
         self.params.append(parameters)

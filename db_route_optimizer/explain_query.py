@@ -251,12 +251,18 @@ def _verify_index(engine, dialect: str, ddl: str, sql: str, analyze: bool, timeo
 
     # Strip CONCURRENTLY for transaction-friendly demo DBs
     ddl_run = ddl.replace("CONCURRENTLY ", "")
+    # Drop pooled connections that may still have PRAGMA query_only / READ ONLY set.
+    engine.dispose()
     before = None
     after = None
     with engine.connect() as conn:
+        if dialect == "sqlite":
+            conn.execute(text("PRAGMA query_only = OFF"))
         before = _fetch_plan(conn, dialect, sql, analyze=analyze)
         conn.commit()
     with engine.begin() as conn:
+        if dialect == "sqlite":
+            conn.execute(text("PRAGMA query_only = OFF"))
         conn.execute(text(ddl_run))
     with engine.connect() as conn:
         after = _fetch_plan(conn, dialect, sql, analyze=analyze)
@@ -267,6 +273,8 @@ def _verify_index(engine, dialect: str, ddl: str, sql: str, analyze: bool, timeo
         drop = f"DROP INDEX IF EXISTS {idx.group(1)}"
         try:
             with engine.begin() as conn:
+                if dialect == "sqlite":
+                    conn.execute(text("PRAGMA query_only = OFF"))
                 conn.execute(text(drop))
         except Exception:
             pass
@@ -355,9 +363,6 @@ def main(argv=None):
 
     engine = create_engine(url)
     dialect = engine.dialect.name
-
-    # MySQL is out of Etapa 1 scope for new features but keep basic explain
-    allow_writes = bool(args.verify and args.suggest_index and local)
 
     with engine.connect() as conn:
         _apply_readonly(conn, dialect, args.timeout_ms, allow_writes=False)

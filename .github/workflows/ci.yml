@@ -1,0 +1,70 @@
+name: ci
+
+on:
+  push:
+    branches: [main, feat/**]
+  pull_request:
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package (dev extras)
+        run: pip install -e '.[dev]'
+
+      - name: Ruff
+        run: ruff check db_route_optimizer scripts tests examples/test_query_guard.py
+
+      - name: Pytest
+        run: pytest tests/ examples/test_query_guard.py -v
+
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dbro
+          POSTGRES_PASSWORD: dbro
+          POSTGRES_DB: dbro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dbro -d dbro"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package (postgres + dev)
+        run: pip install -e '.[dev]'
+
+      - name: Explain on Postgres
+        env:
+          DATABASE_URL: postgresql://dbro:dbro@localhost:5432/dbro
+        run: |
+          python -c "
+          from sqlalchemy import create_engine, text
+          e = create_engine('$DATABASE_URL')
+          with e.begin() as c:
+              c.execute(text('CREATE TABLE IF NOT EXISTS t (id int PRIMARY KEY, n int)'))
+              c.execute(text('INSERT INTO t (id, n) VALUES (1, 10) ON CONFLICT DO NOTHING'))
+          "
+          dbro-explain --database-url "$DATABASE_URL" --plain --json "SELECT * FROM t WHERE n = 10"
+
+      - name: Pytest (incl. SQLite suite)
+        run: pytest tests/ -v
