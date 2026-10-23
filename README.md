@@ -138,6 +138,11 @@ Closed-app measurements stay private. Public hooks/checklists/scripts:
 [`docs/radar/`](docs/radar/README.md). Requires a sanitized local Postgres copy — see the access
 table in that README.
 
+## Article drafts (Etapa 3)
+
+PT-BR + EN drafts (demo numbers from measured logs; Radar still `[MEDIR]`):
+[`docs/article/`](docs/article/README.md). Not for public posting until placeholders are cleared.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
