@@ -4,3 +4,11 @@ __pycache__/
 .DS_Store
 /tmp/
 perf/
+.venv/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+examples/demo_fastapi/demo.db
+examples/demo_fastapi/runs/*/run-*.json
+*.db

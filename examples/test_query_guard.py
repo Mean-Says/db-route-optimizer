@@ -5,13 +5,8 @@ emits, so a future change that reintroduces N+1 fails the build instead of silen
 
 Run locally:  pytest examples/test_query_guard.py -v
 """
-import os
-import sys
-
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
-from querycount import count_queries  # noqa: E402
+from db_route_optimizer.querycount import count_queries
 
 sa = pytest.importorskip("sqlalchemy")
 
@@ -21,12 +16,19 @@ def engine():
     eng = sa.create_engine("sqlite://")
     md = sa.MetaData()
     users = sa.Table("users", md, sa.Column("id", sa.Integer, primary_key=True))
-    posts = sa.Table("posts", md, sa.Column("id", sa.Integer, primary_key=True),
-                     sa.Column("user_id", sa.Integer))
+    posts = sa.Table(
+        "posts",
+        md,
+        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("user_id", sa.Integer),
+    )
     md.create_all(eng)
     with eng.begin() as c:
         c.execute(users.insert(), [{"id": i} for i in range(1, 51)])
-        c.execute(posts.insert(), [{"id": i, "user_id": (i % 50) + 1} for i in range(1, 201)])
+        c.execute(
+            posts.insert(),
+            [{"id": i, "user_id": (i % 50) + 1} for i in range(1, 201)],
+        )
     eng._users, eng._posts = users, posts
     return eng
 

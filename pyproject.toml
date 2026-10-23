@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "db-route-optimizer"
+version = "0.1.0"
+description = "Measure-first DB/route optimization skill and CLI: count queries, EXPLAIN, bench before/after."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Rafael Oliveira" }]
+keywords = ["database", "performance", "benchmark", "sqlalchemy", "postgres", "sqlite"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = []
+
+[project.optional-dependencies]
+sqlalchemy = ["sqlalchemy>=2.0"]
+postgres = ["sqlalchemy>=2.0", "psycopg[binary]>=3.1"]
+dev = [
+  "sqlalchemy>=2.0",
+  "psycopg[binary]>=3.1",
+  "pytest>=7.0",
+  "ruff>=0.4",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27",
+  "httpx>=0.27",
+]
+
+[project.scripts]
+dbro-bench = "db_route_optimizer.bench:main"
+dbro-querycount = "db_route_optimizer.querycount:main"
+dbro-explain = "db_route_optimizer.explain_query:main"
+
+[project.urls]
+Homepage = "https://github.com/Mean-Says/db-route-optimizer"
+Repository = "https://github.com/Mean-Says/db-route-optimizer"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["db_route_optimizer*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "examples"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["db_route_optimizer", "scripts", "tests", "examples"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
